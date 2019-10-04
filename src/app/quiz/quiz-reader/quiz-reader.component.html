@@ -1,0 +1,58 @@
+<div
+  *ngFor="let question of quizData.questions; let i = index"
+  class="row mt-3"
+>
+  <div
+    class="col-12 py-3 question question__title d-flex align-items-center justify-content-between"
+  >
+    <p class="font-weight-bold float-left my-0 mr-2 ">
+      {{ i + 1 }}. {{ question.text }}
+    </p>
+  </div>
+  <!-- <div class="col-12"><mat-divider></mat-divider></div> -->
+  <div
+    *ngFor="let answer of question.answers; let answerIndex = index"
+    class="col-12 question question__answer py-2"
+  >
+    <ng-container [ngSwitch]="question.type">
+      <mat-radio-button
+        *ngSwitchCase="'single'"
+        id="answer-{{ i }}-{{ answerIndex }}"
+        name="answer-{{ i }}"
+        [value]="answer.value"
+        >{{ answer.text }}</mat-radio-button
+      >
+      <mat-form-field *ngSwitchCase="'custom'" class="w-100">
+        <input
+          placeholder="Write your answer"
+          type="text"
+          matNativeControl/></mat-form-field
+      ><mat-checkbox
+        id="answer-{{ i }}-{{ answerIndex }}"
+        name="answer-{{ i }}"
+        [value]="answer.value"
+        *ngSwitchCase="'multiple'"
+        >{{ answer.text }}</mat-checkbox
+      ></ng-container
+    >
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div
+      class="alert"
+      [ngClass]="infoMessage.type === 'error' ? 'alert-danger' : ''"
+      *ngIf="infoMessage.message"
+    >
+      {{ infoMessage.message }}
+    </div>
+  </div>
+</div>
+<div class="row fixed-bottom">
+  <div class="col-12 d-flex justify-content-end pb-4">
+    <button class="mr-4" mat-fab routerLink="edit" color="primary">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,186 @@
+<div
+  *ngFor="let question of quizData.questions; let i = index"
+  class="row mt-3"
+>
+  <div
+    class="col-12 py-3 question question__title d-flex align-items-center justify-content-between"
+  >
+    <ng-template [ngIf]="isBeingEdited(i, -1).isEdited === true"
+      ><mat-form-field>
+        <input
+          placeholder="Edit question"
+          #newQuestionValueInput
+          type="text"
+          value="{{ question.text }}"
+          matNativeControl
+      /></mat-form-field>
+      <div>
+        <button
+          (click)="changeEditedElement(i, -1, newQuestionValueInput.value)"
+          mat-icon-button
+        >
+          <mat-icon>done</mat-icon>
+        </button>
+        <button mat-icon-button (click)="removeQuestion(i)" color="warn">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div></ng-template
+    >
+    <ng-template [ngIf]="isBeingEdited(i, -1).isEdited !== true"
+      ><p class="font-weight-bold float-left my-0 mr-2 ">
+        {{ i + 1 }}. {{ question.text }}
+      </p>
+      <div>
+        <button (click)="toggleBeingEditedStatus(i, -1)" mat-icon-button>
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="removeQuestion(i)" color="warn">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div></ng-template
+    >
+  </div>
+  <div class="col-12"><mat-divider></mat-divider></div>
+  <div
+    *ngFor="let answer of question.answers; let answerIndex = index"
+    class="col-12 question question__answer py-2 d-flex align-items-center justify-content-between"
+  >
+    <ng-template [ngIf]="isBeingEdited(i, answerIndex).isEdited !== true">
+      <ng-container [ngSwitch]="question.type">
+        <mat-radio-button
+          *ngSwitchCase="'single'"
+          id="answer-{{ i }}-{{ answerIndex }}"
+          name="answer-{{ i }}"
+          [value]="answer.value"
+          disabled
+          >{{ answer.text }}</mat-radio-button
+        >
+        <mat-form-field *ngSwitchCase="'custom'" class="w-100">
+          <input
+            placeholder="Write your answer"
+            type="text"
+            matNativeControl
+            disabled/></mat-form-field
+        ><mat-checkbox
+          id="answer-{{ i }}-{{ answerIndex }}"
+          name="answer-{{ i }}"
+          [value]="answer.value"
+          *ngSwitchCase="'multiple'"
+          disabled
+          >{{ answer.text }}</mat-checkbox
+        ></ng-container
+      >
+      <div *ngIf="question.type !== 'custom'">
+        <button
+          (click)="toggleBeingEditedStatus(i, answerIndex)"
+          mat-icon-button
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="removeAnswer(i, answerIndex)"
+          color="warn"
+        >
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div></ng-template
+    >
+    <ng-template
+      [ngIf]="
+        question.type !== 'custom' &&
+        isBeingEdited(i, answerIndex).isEdited === true
+      "
+    >
+      <mat-form-field>
+        <input
+          placeholder="Edit answer"
+          #newAnswerValueInput
+          type="text"
+          value="{{ answer.text }}"
+          matNativeControl
+      /></mat-form-field>
+      <div *ngIf="question.type !== 'custom'">
+        <button
+          (click)="
+            changeEditedElement(i, answerIndex, newAnswerValueInput.value)
+          "
+          mat-icon-button
+        >
+          <mat-icon>done</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="removeAnswer(i, answerIndex)"
+          color="warn"
+        >
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div>
+    </ng-template>
+  </div>
+  <ng-template [ngIf]="!(question.type === 'custom')"
+    ><div class="col-md-9 d-flex align-items-center mt-3">
+      <mat-form-field class="w-100">
+        <input
+          placeholder="add answer"
+          type="text"
+          (keyup.enter)="addAnswer(answerInput.value, i)"
+          matNativeControl
+          #answerInput
+      /></mat-form-field>
+    </div>
+    <div class="col-md-3 mt-3 d-flex align-items-center">
+      <button
+        mat-raised-button
+        (click)="addAnswer(answerInput.value, i)"
+        class="w-100"
+      >
+        Add answer
+      </button>
+    </div></ng-template
+  >
+</div>
+<div class="row mb-3">
+  <div class="col-md-9 mt-3">
+    <mat-form-field class="w-100">
+      <input
+        type="text"
+        placeholder="add question"
+        matNativeControl
+        (keyup.enter)="addQuestion(questionInput.value)"
+        #questionInput
+    /></mat-form-field>
+  </div>
+  <div class="col-md-3 mt-3 d-flex align-items-center">
+    <button
+      mat-raised-button
+      (click)="addQuestion(questionInput.value)"
+      class="w-100"
+    >
+      Add question
+    </button>
+  </div>
+</div>
+<div class="row mb-3">
+  <div class="col-12">
+    <div
+      class="alert"
+      [ngClass]="infoMessage.type === 'error' ? 'alert-danger' : ''"
+      *ngIf="infoMessage.message"
+    >
+      {{ infoMessage.message }}
+    </div>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col-12">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="saveQuizChanges(quizData)"
+    >
+      Save
+    </button>
+  </div>
+</div>

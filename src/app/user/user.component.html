@@ -1,0 +1,6 @@
+<div *ngIf="user404" class="row">
+  <div class="col-12">
+    <div class="alert alert-danger">User not found!</div>
+  </div>
+</div>
+<router-outlet *ngIf="!user404"></router-outlet>
