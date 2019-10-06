@@ -8,6 +8,7 @@ import { Quiz } from "./quiz";
 export class QuizService {
   constructor() {}
   private quizData: Quiz = {
+    title: "Sample Title",
     questions: []
   };
   getUser(user) {

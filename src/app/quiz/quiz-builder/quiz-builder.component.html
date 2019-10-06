@@ -1,3 +1,29 @@
+<div *ngIf="quizData.title" class="row mt-4">
+  <div class="col-12 d-flex justify-content-between align-items-center">
+    <ng-template [ngIf]="isBeingEdited(-1, -1) !== true">
+      <h2>{{ quizData.title }}</h2>
+      <button (click)="toggleBeingEdited(-1, -1)" mat-icon-button>
+        <mat-icon>edit</mat-icon>
+      </button></ng-template
+    >
+    <ng-template [ngIf]="isBeingEdited(-1, -1) === true">
+      <mat-form-field>
+        <input
+          placeholder="Edit title"
+          #titleText
+          type="text"
+          value="{{ quizData.title }}"
+          matNativeControl
+      /></mat-form-field>
+      <button
+        (click)="changeEditedElement(-1, -1, titleText.value)"
+        mat-icon-button
+      >
+        <mat-icon>done</mat-icon>
+      </button></ng-template
+    >
+  </div>
+</div>
 <div
   *ngFor="let question of quizData.questions; let i = index"
   class="row mt-3"
@@ -5,36 +31,36 @@
   <div
     class="col-12 py-3 question question__title d-flex align-items-center justify-content-between"
   >
-    <ng-template [ngIf]="isBeingEdited(i, -1).isEdited === true"
+    <ng-template [ngIf]="isBeingEdited(i, -1) === true"
       ><mat-form-field>
         <input
           placeholder="Edit question"
-          #newQuestionValueInput
+          #questionText
           type="text"
           value="{{ question.text }}"
           matNativeControl
       /></mat-form-field>
       <div>
         <button
-          (click)="changeEditedElement(i, -1, newQuestionValueInput.value)"
+          (click)="changeEditedElement(i, -1, questionText.value)"
           mat-icon-button
         >
           <mat-icon>done</mat-icon>
         </button>
-        <button mat-icon-button (click)="removeQuestion(i)" color="warn">
+        <button mat-icon-button (click)="removeQField(i, -1)" color="warn">
           <mat-icon>cancel</mat-icon>
         </button>
       </div></ng-template
     >
-    <ng-template [ngIf]="isBeingEdited(i, -1).isEdited !== true"
+    <ng-template [ngIf]="isBeingEdited(i, -1) !== true"
       ><p class="font-weight-bold float-left my-0 mr-2 ">
         {{ i + 1 }}. {{ question.text }}
       </p>
       <div>
-        <button (click)="toggleBeingEditedStatus(i, -1)" mat-icon-button>
+        <button (click)="toggleBeingEdited(i, -1)" mat-icon-button>
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button (click)="removeQuestion(i)" color="warn">
+        <button mat-icon-button (click)="removeField(i, -1)" color="warn">
           <mat-icon>cancel</mat-icon>
         </button>
       </div></ng-template
@@ -45,7 +71,7 @@
     *ngFor="let answer of question.answers; let answerIndex = index"
     class="col-12 question question__answer py-2 d-flex align-items-center justify-content-between"
   >
-    <ng-template [ngIf]="isBeingEdited(i, answerIndex).isEdited !== true">
+    <ng-template [ngIf]="isBeingEdited(i, answerIndex) !== true">
       <ng-container [ngSwitch]="question.type">
         <mat-radio-button
           *ngSwitchCase="'single'"
@@ -71,15 +97,12 @@
         ></ng-container
       >
       <div *ngIf="question.type !== 'custom'">
-        <button
-          (click)="toggleBeingEditedStatus(i, answerIndex)"
-          mat-icon-button
-        >
+        <button (click)="toggleBeingEdited(i, answerIndex)" mat-icon-button>
           <mat-icon>edit</mat-icon>
         </button>
         <button
           mat-icon-button
-          (click)="removeAnswer(i, answerIndex)"
+          (click)="removeField(i, answerIndex)"
           color="warn"
         >
           <mat-icon>cancel</mat-icon>
@@ -88,23 +111,20 @@
     >
     <ng-template
       [ngIf]="
-        question.type !== 'custom' &&
-        isBeingEdited(i, answerIndex).isEdited === true
+        question.type !== 'custom' && isBeingEdited(i, answerIndex) === true
       "
     >
       <mat-form-field>
         <input
           placeholder="Edit answer"
-          #newAnswerValueInput
+          #answerText
           type="text"
           value="{{ answer.text }}"
           matNativeControl
       /></mat-form-field>
       <div *ngIf="question.type !== 'custom'">
         <button
-          (click)="
-            changeEditedElement(i, answerIndex, newAnswerValueInput.value)
-          "
+          (click)="changeEditedElement(i, answerIndex, answerText.value)"
           mat-icon-button
         >
           <mat-icon>done</mat-icon>

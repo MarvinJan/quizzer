@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
-import { switchMap } from "rxjs/operators";
 
 import { InfoMessage } from "src/app/shared/info-message";
 import { Quiz, questionType } from "../quiz";
@@ -54,18 +53,22 @@ export class QuizBuilderComponent implements OnInit {
     this.quizData.questions[questionIndex].answers = [];
   }
 
-  private removeQuestion(index: number) {
-    this.quizData.questions.splice(index, 1);
+  private removeField(questionIndex: number, answerIndex: number) {
+    if (answerIndex === -1) {
+      this.quizData.questions.splice(questionIndex, 1);
+    } else
+      this.quizData.questions[questionIndex].answers.splice(answerIndex, 1);
   }
 
-  private removeAnswer(questionIndex: number, answerIndex: number) {
-    this.quizData.questions[questionIndex].answers.splice(answerIndex, 1);
-  }
-
-  private toggleBeingEditedStatus(questionIndex: number, answerIndex: number) {
+  private toggleBeingEdited(questionIndex: number, answerIndex: number) {
     const editedInfo = this.isBeingEdited(questionIndex, answerIndex);
-    if (editedInfo.isEdited === true) {
-      this.areBeingEdited.splice(editedInfo.indexOfEdited, 1);
+    if (this.isBeingEdited(questionIndex, answerIndex) === true) {
+      let indexOfEdited = this.areBeingEdited.findIndex(
+        element =>
+          JSON.stringify(element) ===
+          JSON.stringify([questionIndex, answerIndex])
+      );
+      this.areBeingEdited.splice(indexOfEdited, 1);
     } else {
       this.areBeingEdited.push([questionIndex, answerIndex]);
     }
@@ -76,31 +79,26 @@ export class QuizBuilderComponent implements OnInit {
     answerIndex: number,
     newValue: string
   ) {
-    if (answerIndex === -1)
+    if (questionIndex === -1 && answerIndex === -1)
+      this.quizData.title = newValue;
+    else if (answerIndex === -1) {
       this.quizData.questions[questionIndex].text = newValue;
-    else {
+    } else {
       this.quizData.questions[questionIndex].answers[
         answerIndex
       ].text = newValue;
     }
-    this.toggleBeingEditedStatus(questionIndex, answerIndex);
+    this.toggleBeingEdited(questionIndex, answerIndex);
   }
 
   private isBeingEdited(questionIndex: number, answerIndex: number) {
-    const editedInfo = {
-      isEdited: null,
-      indexOfEdited: null
-    };
-    this.areBeingEdited.some((element, i) => {
+    return this.areBeingEdited.some((element, i) => {
       if (
         JSON.stringify(element) === JSON.stringify([questionIndex, answerIndex])
       ) {
-        editedInfo.isEdited = true;
-        editedInfo.indexOfEdited = i;
         return true;
       }
     });
-    return editedInfo;
   }
 
   private saveQuizChanges(quizData) {
